@@ -44,17 +44,16 @@
     }
   }
 
-  function saveState() {
+  function saveState(markToday) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(acMap));
       localStorage.setItem(FILTER_KEY, currentFilter);
       if (chrome && chrome.storage && chrome.storage.local) {
-        const todayStr = new Date().toISOString().slice(0, 10);
-        chrome.storage.local.set({
-          [STORAGE_KEY]: acMap,
-          [FILTER_KEY]: currentFilter,
-          last_ac_date: todayStr
-        });
+        const payload = { [STORAGE_KEY]: acMap, [FILTER_KEY]: currentFilter };
+        if (markToday) {
+          payload.last_ac_date = new Date().toISOString().slice(0, 10);
+        }
+        chrome.storage.local.set(payload);
       }
       try {
         chrome.runtime?.sendMessage?.({ action: 'UPDATE_BADGE' });
@@ -283,7 +282,7 @@
         </div>
         <div class="lh-drawer-stats">
           <span>当前计划达成：${solvedCount} / ${list.length} 题 (${percent}%)</span>
-          <span>按 Alt+← / Alt+→ 快速切题</span>
+          <button type="button" id="lh-sync-lc-btn" title="自动读取你当前登录的力扣账号已AC记录，跨电脑/跨浏览器同步进度" style="background:rgba(110,212,183,0.14);border:1px solid rgba(110,212,183,0.35);color:#6ED4B7;border-radius:10px;padding:2px 8px;font-size:11px;cursor:pointer;">🔄 同步力扣账号进度</button>
         </div>
       </div>
       <div class="lh-drawer-body">
@@ -293,6 +292,9 @@
 
     // 绑定抽屉事件
     document.getElementById('lh-drawer-close-btn')?.addEventListener('click', closeDrawer);
+    document.getElementById('lh-sync-lc-btn')?.addEventListener('click', () => {
+      syncProgressFromLeetCode(true);
+    });
     
     // 切换模式 tab
     drawerEl.querySelectorAll('.lh-drawer-tab').forEach(tab => {
@@ -1518,7 +1520,7 @@
         if ((txt === '通过' || txt === 'Accepted') && el.offsetWidth > 0 && el.offsetHeight > 0) {
           if (curProblem && !acMap[curProblem.id]) {
             acMap[curProblem.id] = Date.now();
-            saveState();
+            saveState(true);
             renderPlanBar();
             triggerAcToast();
           }
@@ -1966,11 +1968,116 @@ ${userCode || '// 尚未输入代码'}
     if (isDrawerOpen) renderDrawer();
   }
 
+  // ------------------------------------------------------------------
+  // 从当前登录的力扣账号自动同步已刷进度（跨电脑 / 跨浏览器核心同步）
+  // ------------------------------------------------------------------
+  async function syncProgressFromLeetCode(isManual) {
+    if (typeof PROBLEMS === 'undefined') return;
+    const syncKey = 'ling_last_lc_sync_ts';
+    try {
+      const lastTs = Number(localStorage.getItem(syncKey) || '0');
+      if (!isManual && Date.now() - lastTs < 5 * 60 * 1000) {
+        return; // 5 分钟内已自动同步过
+      }
+    } catch (e) {}
+
+    const btn = document.getElementById('lh-sync-lc-btn');
+    if (btn && isManual) {
+      btn.textContent = '🔄 同步中...';
+      btn.disabled = true;
+    }
+
+    let addedCount = 0;
+    let totalMatched = 0;
+    let userName = '';
+
+    try {
+      // 1. 拉取力扣全量题库个人通过状态
+      const resp = await fetch(`${window.location.origin}/api/problems/all/`, { credentials: 'include' });
+      if (resp.ok) {
+        const data = await resp.json();
+        userName = data.user_name || '';
+        const pairs = data.stat_status_pairs || [];
+        const solvedSlugs = new Set();
+        const solvedIds = new Set();
+        pairs.forEach(item => {
+          if (item && item.status === 'ac' && item.stat) {
+            if (item.stat.question__title_slug) solvedSlugs.add(item.stat.question__title_slug);
+            if (item.stat.frontend_question_id) solvedIds.add(String(item.stat.frontend_question_id));
+          }
+        });
+
+        if (userName || solvedSlugs.size > 0) {
+          PROBLEMS.forEach(p => {
+            if (solvedSlugs.has(p.slug) || (p.lcNum && solvedIds.has(String(p.lcNum)))) {
+              totalMatched++;
+              if (!acMap[p.id]) {
+                acMap[p.id] = true; // 历史已AC记录标记为 true（不伪造今日时间戳）
+                addedCount++;
+              }
+            }
+          });
+        }
+      }
+
+      // 2. 补充检查当前题目实时 GraphQL 状态
+      if (curProblem && curProblem.slug && !acMap[curProblem.id]) {
+        const gResp = await fetch(`${window.location.origin}/graphql/`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: 'query questionStatus($titleSlug: String!) { question(titleSlug: $titleSlug) { status } }',
+            variables: { titleSlug: curProblem.slug }
+          })
+        });
+        if (gResp.ok) {
+          const gData = await gResp.json();
+          if (gData?.data?.question?.status === 'ac') {
+            acMap[curProblem.id] = true;
+            addedCount++;
+            totalMatched++;
+          }
+        }
+      }
+
+      try { localStorage.setItem(syncKey, String(Date.now())); } catch (e) {}
+
+      if (addedCount > 0) {
+        saveState();
+        renderPlanBar();
+        if (isDrawerOpen) renderDrawer();
+      }
+
+      if (isManual && btn) {
+        if (!userName && totalMatched === 0) {
+          btn.textContent = '⚠️ 请先登录力扣';
+        } else {
+          btn.textContent = addedCount > 0 ? `✓ 新增同步 ${addedCount} 题` : `✓ 已同步 (${totalMatched} 题)`;
+        }
+        setTimeout(() => {
+          const b = document.getElementById('lh-sync-lc-btn');
+          if (b) { b.textContent = '🔄 同步力扣账号进度'; b.disabled = false; }
+        }, 2500);
+      }
+    } catch (err) {
+      console.warn('[灵神助教] 同步力扣进度失败:', err);
+      if (isManual && btn) {
+        btn.textContent = '⚠️ 同步失败';
+        setTimeout(() => {
+          const b = document.getElementById('lh-sync-lc-btn');
+          if (b) { b.textContent = '🔄 同步力扣账号进度'; b.disabled = false; }
+        }, 2000);
+      }
+    }
+  }
+
   function init() {
     loadState();
     updateStateFromUrl();
     observeLeetCodeSubmissions();
     setupKeyboardShortcuts();
+    syncProgressFromLeetCode(false);
     setInterval(updateStateFromUrl, 1500);
   }
 
