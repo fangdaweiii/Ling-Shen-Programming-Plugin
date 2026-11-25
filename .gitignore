@@ -1,0 +1,15 @@
+# Backups & OS files
+*.backup.html
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python / Node caches
+__pycache__/
+*.pyc
+node_modules/
+
+# IDE / Temp
+.vscode/
+.idea/
+*.log

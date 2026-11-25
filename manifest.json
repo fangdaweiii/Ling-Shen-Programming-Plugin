@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "灵神力扣算法助教 · CodeTeacher",
+  "version": "1.0.0",
+  "description": "基于灵茶山艾府《如何科学刷题？》方法论打造：力扣真题自适应识别、Contest Rating 难度分注入、灵神红蓝染色与滑窗模板速查、代码逐行动画演示。",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "灵神算法助教 · 点击直接直达今日力扣真题",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "permissions": [
+    "sidePanel",
+    "activeTab",
+    "storage",
+    "alarms"
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://leetcode.cn/problems/*",
+        "https://leetcode.com/problems/*"
+      ],
+      "js": [
+        "data/modules.js",
+        "data/knowledge.js",
+        "data/problems.js",
+        "js/interpreter.js",
+        "extension/content.js"
+      ],
+      "css": [
+        "extension/content.css"
+      ],
+      "run_at": "document_end"
+    }
+  ]
+}

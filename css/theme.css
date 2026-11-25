@@ -1,0 +1,92 @@
+/* theme.css - 颜色变量、浅色/深色主题与基础重置 */
+:root {
+  --bg: #081311;
+  --panel: #0C1B18;
+  --panel2: #10231F;
+  --line: rgba(110,212,183,.14);
+  --ink: #E6F1ED;
+  --dim: #8FA9A2;
+  --mute: #5F7A73;
+  --mint: #6ED4B7;
+  --coral: #E9785F;
+  --amber: #F2A64D;
+  --mono: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(900px 520px at 18% -10%, rgba(110,212,183,.10), transparent 70%),
+              radial-gradient(700px 420px at 96% 8%, rgba(242,166,77,.07), transparent 70%);
+}
+button, textarea, input { font-family: inherit; }
+h1, h2, h3, p { margin: 0; }
+a { color: var(--mint); }
+
+/* ==================== 浅色护眼主题 ==================== */
+body.light-theme {
+  --bg: #F3F6F5;
+  --panel: #FFFFFF;
+  --panel2: #E8EFEC;
+  --line: rgba(22, 101, 80, 0.16);
+  --ink: #1B2E2A;
+  --dim: #4B6B63;
+  --mute: #6E8E87;
+  --mint: #0E8F6F;
+  --coral: #D44226;
+  --amber: #CF7311;
+}
+body.light-theme::before {
+  background: radial-gradient(900px 520px at 18% -10%, rgba(14, 143, 111, 0.08), transparent 70%),
+              radial-gradient(700px 420px at 96% 8%, rgba(207, 115, 17, 0.06), transparent 70%);
+}
+body.light-theme .edx,
+body.light-theme pre.code,
+body.light-theme .tbInput,
+body.light-theme .aiCode,
+body.light-theme .gutter {
+  background: #EBF1EE;
+  color: #172D28;
+}
+body.light-theme .gutter {
+  border-right-color: rgba(0,0,0,0.08);
+  color: #7A958E;
+}
+body.light-theme .hl { color: #172D28; }
+body.light-theme .hl .kw { color: #0C5CBF; }
+body.light-theme .hl .ty { color: #077C5E; }
+body.light-theme .hl .num { color: #B35800; }
+body.light-theme .hl .str { color: #9B4C0A; }
+body.light-theme .hl .cm { color: #728D86; }
+body.light-theme .marks .curLine { background: rgba(14, 143, 111, 0.08); }
+body.light-theme .marks .brk { background: rgba(14, 143, 111, 0.2); box-shadow: 0 0 0 1px rgba(14, 143, 111, 0.6); }
+body.light-theme .card,
+body.light-theme .badgeBox,
+body.light-theme .rbox,
+body.light-theme .shareBox,
+body.light-theme .dshell {
+  background: #FFFFFF;
+}
+body.light-theme .statGrid div,
+body.light-theme .ioGrid div,
+body.light-theme .case {
+  background: rgba(0,0,0,0.02);
+}
+body.light-theme .filterBar button.on {
+  background: rgba(14, 143, 111, 0.12);
+  color: var(--mint);
+}

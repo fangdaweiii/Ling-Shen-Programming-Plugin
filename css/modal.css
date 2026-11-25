@@ -1,0 +1,96 @@
+/* modal.css - 弹窗、学习报告、成就墙、打卡分享卡片与知识卡片 */
+.toast {
+  position: fixed; left: 50%; bottom: 26px; transform: translate(-50%,18px); background: #12251F; color: var(--ink);
+  border: 1px solid rgba(110,212,183,.34); border-radius: 9px; padding: 9px 14px; font-size: 12.5px; opacity: 0;
+  pointer-events: none; transition: .22s; z-index: 90; box-shadow: 0 10px 30px rgba(0,0,0,.45);
+}
+.toast.on { opacity: 1; transform: translate(-50%,0); }
+
+/* 学习报告 */
+.rmask {
+  position: fixed; inset: 0; background: rgba(3,8,7,.72); backdrop-filter: blur(4px); z-index: 70; display: none;
+  align-items: center; justify-content: center; padding: 24px;
+}
+.rmask.on { display: flex; }
+.rbox {
+  width: min(760px,100%); max-height: 86vh; display: flex; flex-direction: column; background: #0A1715;
+  border: 1px solid rgba(110,212,183,.24); border-radius: 14px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.6);
+}
+.rhead { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid var(--line); }
+.rhead h3 { font-size: 15px; font-weight: 600; color: var(--ink); }
+.rbody { padding: 15px 16px; overflow: auto; display: flex; flex-direction: column; gap: 14px; }
+.rfoot { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-top: 1px solid var(--line); }
+.rGrid { display: grid; grid-template-columns: repeat(4,1fr); gap: 9px; }
+.rStat { background: rgba(255,255,255,.02); border: 1px solid var(--line); border-radius: 9px; padding: 9px 10px; }
+.rStat b { display: block; font: 600 18px/1.2 var(--sans); color: var(--ink); }
+.rStat span { font-size: 10.5px; color: #6F8A83; }
+
+/* 成就勋章墙 */
+.badgeMask {
+  position: fixed; inset: 0; background: rgba(3,8,7,.75); backdrop-filter: blur(5px); z-index: 75; display: none;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.badgeMask.on { display: flex; }
+.badgeBox {
+  width: min(720px, 100%); max-height: 85vh; display: flex; flex-direction: column; background: #0A1715;
+  border: 1px solid rgba(110,212,183,.28); border-radius: 14px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.7);
+}
+.badgeHead { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-bottom: 1px solid var(--line); }
+.badgeHead h3 { font-size: 15px; font-weight: 600; color: var(--ink); }
+.badgeBody { padding: 16px; overflow: auto; display: flex; flex-direction: column; gap: 10px; }
+.badgeGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media(max-width: 600px) { .badgeGrid { grid-template-columns: 1fr; } }
+.badgeCard { display: flex; gap: 11px; align-items: center; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.02); transition: .2s; }
+.badgeCard.on { border-color: rgba(110,212,183,.4); background: rgba(110,212,183,.06); }
+.badgeCard.locked { opacity: .55; filter: grayscale(80%); }
+.bIcon { font-size: 26px; line-height: 1; flex: 0 0 34px; text-align: center; }
+.bInfo { flex: 1; min-width: 0; }
+.bName { font-size: 13px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+.bTag { font: 500 9px/1 var(--sans); border-radius: 4px; padding: 2px 5px; background: rgba(110,212,183,.18); color: var(--mint); }
+.bTag.lock { background: rgba(255,255,255,.08); color: var(--mute); }
+.bDesc { font-size: 11px; color: var(--dim); margin-top: 3px; line-height: 1.4; }
+
+/* 打卡卡片弹窗 */
+.shareMask {
+  position: fixed; inset: 0; background: rgba(3,8,7,.78); backdrop-filter: blur(6px); z-index: 80; display: none;
+  align-items: center; justify-content: center; padding: 18px;
+}
+.shareMask.on { display: flex; }
+.shareBox {
+  width: min(520px, 100%); max-height: 90vh; display: flex; flex-direction: column; background: #0A1715;
+  border: 1px solid rgba(110,212,183,.32); border-radius: 14px; overflow: hidden; box-shadow: 0 35px 85px rgba(0,0,0,.75);
+}
+.shareHead { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.shareBody { padding: 16px; overflow: auto; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.shareCanvasWrap { border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); max-width: 100%; }
+.shareCanvas { display: block; max-width: 100%; height: auto; }
+.shareFoot { display: flex; gap: 10px; justify-content: flex-end; padding: 12px 16px; border-top: 1px solid var(--line); }
+
+/* 知识卡片与解法对比 */
+.kbWrap { padding: 4px 2px; display: flex; flex-direction: column; gap: 14px; }
+.kbHead h3 { font-size: 15px; font-weight: 600; color: var(--mint); }
+.kbSec { background: rgba(255,255,255,.015); border: 1px solid var(--line); border-radius: 9px; padding: 10px 12px; }
+.kbTitle { font: 600 11px/1 var(--sans); letter-spacing: 1px; color: var(--amber); margin-bottom: 8px; text-transform: uppercase; }
+.kbList { margin: 0; padding-left: 18px; color: #C9DCD6; font-size: 12.5px; line-height: 1.8; }
+.kbTplHead { font: 600 11px/1.4 var(--mono); color: var(--dim); margin: 6px 0 4px; }
+.kbGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+.kbGridItem { background: rgba(0,0,0,.2); border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; }
+.kbGridItem b { display: block; font-size: 11.5px; color: var(--ink); margin-bottom: 2px; }
+.kbGridItem span { font-size: 10.5px; color: var(--mute); font-family: var(--mono); }
+.kbConn { font-size: 12px; color: #C9DCD6; line-height: 1.6; margin: 0; }
+
+.cplxCard { margin-top: 12px; padding: 10px 12px; border: 1px dashed rgba(110,212,183,.3); border-radius: 9px; background: rgba(110,212,183,.03); }
+.cplxHead { font: 600 11px/1.4 var(--sans); color: var(--mint); margin-bottom: 8px; }
+.cplxRow { display: flex; align-items: center; gap: 8px; }
+.cplxOpts { display: flex; gap: 5px; flex-wrap: wrap; }
+.cplxOpts button { font-family: var(--mono); font-size: 11px; padding: 3px 7px; }
+.cplxAns { padding: 8px 10px; background: rgba(0,0,0,.25); border-radius: 6px; font-size: 11.5px; line-height: 1.5; color: #C9DCD6; }
+
+.solSeg { display: flex; gap: 6px; margin-bottom: 12px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.solSeg button { font-size: 11.5px; padding: 5px 9px; border-radius: 6px; border: 1px solid var(--line); background: transparent; color: var(--dim); cursor: pointer; }
+.solSeg button.on { background: rgba(110,212,183,.14); color: var(--mint); border-color: rgba(110,212,183,.4); }
+.solActions { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.solCmpTable { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px; }
+.solCmpTable th, .solCmpTable td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; }
+.solCmpTable th { background: rgba(255,255,255,0.03); color: var(--mint); font-family: var(--sans); }
+.solCmpTable td { color: #C9DCD6; }

@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>算法训练台 · C++ 每日一题 · 力扣侧边栏助教</title>
+  
+  <!-- CSS 模块 -->
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/demo.css">
+  <link rel="stylesheet" href="css/modal.css">
+  <link rel="stylesheet" href="css/ai.css">
+</head>
+<body>
+
+<div class="mobHeaderBar">
+  <button type="button" class="mobMenuBtn" id="mobDrawerOpen" title="打开侧边导航">☰</button>
+  <b style="font-size:14px;color:var(--mint)">算法训练台</b>
+  <button type="button" class="btn sm" id="mobThemeBtn">🌓</button>
+</div>
+<div class="railBackdrop" id="railBackdrop"></div>
+
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <div class="logo">C++</div>
+      <div>
+        <h1>算法训练台</h1>
+        <p>每天一题 · 按模块推进</p>
+      </div>
+    </div>
+
+    <section class="card today">
+      <div class="cardHead"><span class="lab">今日任务</span><span class="pill" id="streakPill">连续 0 天</span></div>
+      <h2 id="todayTitle">加载中…</h2>
+      <div class="metaRow" id="todayMeta"></div>
+      <div class="bar"><i id="todayBar"></i></div>
+      <button class="btn primary wide" id="todayCta" type="button">开始今日题</button>
+      <div class="todayNav" id="todayNav"></div>
+    </section>
+
+    <section class="card recent" id="recentCard" style="display:none">
+      <div class="cardHead"><span class="lab">最近做过</span><span class="tiny">点一下回到那题</span></div>
+      <div class="recentList" id="recentList"></div>
+    </section>
+
+    <section class="card review" id="reviewCard" style="display:none">
+      <div class="cardHead"><span class="lab">回炉重练</span><span class="tiny" id="reviewSum">—</span></div>
+      <div class="reviewList" id="reviewList"></div>
+    </section>
+
+    <section class="card">
+      <div class="cardHead"><span class="lab">学习路线 · 灵神科学刷题</span><span class="tiny" id="routeSum">—</span></div>
+      <div class="filterBar">
+        <button type="button" data-diff="0" class="on" id="fDiffAll">全部</button>
+        <button type="button" id="fNewbieBtn" title="灵神推荐：新手村核心题 (Rating ≤ 1700)">🌱 新手村</button>
+        <button type="button" id="fHotBtn" title="经典面试突击：LeetCode Hot 100 必刷题">🔥 Hot100</button>
+        <button type="button" id="fWrongBtn" title="只看曾答错的题目">错题</button>
+        <button type="button" id="fBlindBtn" title="盲盒模式：隐去题型与标签，检验实战嗅觉">🎲 盲盒</button>
+        <button type="button" id="fRandBtn" title="在当前筛选中随机抽取一题">抽题</button>
+      </div>
+      <div class="railSearch">
+        <input id="probSearch" type="text" spellcheck="false" placeholder="搜题目 / 编号 / 标签">
+        <div class="searchList" id="searchList"></div>
+      </div>
+      <div class="route" id="modules"></div>
+    </section>
+
+    <section class="card">
+      <div class="cardHead"><span class="lab">数据</span><span class="tiny">存在本机</span></div>
+      <div class="statGrid">
+        <div><b id="stAc">0</b><span>已解决</span></div>
+        <div><b id="stRate">—</b><span>一次通过率</span></div>
+        <div><b id="stTry">0</b><span>总提交</span></div>
+        <div><b id="stErr">0</b><span>错题记录</span></div>
+      </div>
+      <div class="railActions">
+        <button class="btn ghost sm" id="badgeBtn" type="button" title="查看算法勋章墙">🎖️ 我的成就</button>
+        <button class="btn ghost sm" id="repBtn" type="button">学习报告</button>
+        <button class="btn ghost sm" id="expJsonBtn" type="button" title="导出全部进度（JSON，可再导入）">备份进度</button>
+        <button class="btn ghost sm" id="impBtn" type="button">恢复备份</button>
+        <button class="btn ghost sm" id="expBtn" type="button">导出报告</button>
+        <button class="btn ghost sm" id="wipeBtn" type="button">清空进度</button>
+      </div>
+    </section>
+  </aside>
+
+  <main class="main">
+    <header class="head">
+      <div class="headMain">
+        <div class="crumb" id="crumb">—</div>
+        <h2 id="pTitl">—</h2>
+        <div class="tags" id="pTags"></div>
+      </div>
+      <div class="headRight">
+        <div class="pnav">
+          <button class="pnavBtn" id="prevProb" type="button" title="上一题">←</button>
+          <span class="pnavPos" id="pPos">—</span>
+          <button class="pnavBtn" id="nextProb" type="button" title="下一题">→</button>
+        </div>
+        <div class="timer" id="timer">00:00</div>
+        <button class="btn ghost sm" id="themeToggleBtn" type="button" title="切换浅色/深色护眼模式">☀️ 浅色</button>
+        <button class="btn ghost sm" id="shareCardBtn" type="button" title="生成算法学习打卡卡片">📸 打卡</button>
+        <button class="btn ghost sm" id="resetCodeBtn" type="button">重置代码</button>
+      </div>
+    </header>
+
+    <div class="body">
+      <div class="left">
+        <section class="card prob" id="probCard"></section>
+
+        <section class="card editor">
+          <div class="edTop">
+            <div class="fname"><b id="fileName">solution.cpp</b> · 单文件</div>
+            <div class="badges">
+              <button class="btn ghost sm" id="formatCodeBtn" type="button" title="一键规范 C++ 缩进" style="padding:2px 7px;font-size:11px">格式化</button>
+              <button class="btn ghost sm" id="fontSizeBtn" type="button" title="循环调节字体大小 (12px ~ 17px)" style="padding:2px 7px;font-size:11px">字号 A±</button>
+              <span class="chip">C++17</span>
+              <span class="chip mint" id="engChip">内置判题</span>
+            </div>
+          </div>
+          <div class="edx">
+            <div class="gutter" id="gutter"></div>
+            <div class="edbody" id="edbody">
+              <div class="marks" id="marks" aria-hidden="true"></div>
+              <pre class="hl" id="hl" aria-hidden="true"></pre>
+              <textarea id="ta" class="ta" spellcheck="false" autocomplete="off" autocapitalize="off" wrap="off"></textarea>
+              <div class="acpop" id="ac"></div>
+              <div class="findBar" id="findBar">
+                <input id="findInput" type="text" spellcheck="false" placeholder="查找代码…" aria-label="代码内查找">
+                <span class="findCount" id="findCount">0/0</span>
+                <button id="findPrev" type="button" title="上一个" aria-label="上一个匹配">↑</button>
+                <button id="findNext" type="button" title="下一个" aria-label="下一个匹配">↓</button>
+                <button id="findClose" type="button" title="关闭" aria-label="关闭查找">✕</button>
+              </div>
+            </div>
+          </div>
+          <div class="segRow">
+            <span class="tiny">判题引擎</span>
+            <div class="seg" id="segEngine">
+              <button type="button" data-eng="interp" class="on">内置解释器</button>
+              <button type="button" data-eng="online">在线编译</button>
+            </div>
+            <span class="tiny" id="engHint">内置解释器：数组 / vector / string / 递归 / 链表 / 二叉树都能离线判</span>
+          </div>
+          <div class="testbench" id="testbench">
+            <div class="tbHeader">
+              <span class="lab">自定义输入调试台</span>
+              <div class="tbActions">
+                <button type="button" class="btn sm ghost" id="tbSample1Btn" title="填入题目样例 1">📋 样例 1</button>
+                <button type="button" class="btn sm ghost" id="tbSample2Btn" title="填入题目样例 2">📋 样例 2</button>
+                <button type="button" class="btn sm ghost" id="tbRandBtn" title="基于本题参数规则随机生成一组用例">⚡ 随机用例</button>
+                <button type="button" class="btn sm ghost" id="tbClearBtn" title="清空测试输入">清空</button>
+              </div>
+            </div>
+            <textarea id="stdinBox" class="tbInput" rows="2" spellcheck="false" placeholder="多参数用 | 分隔，如 [1,2,3] | 2；留空则运行题目内置用例"></textarea>
+          </div>
+          <div class="mobBar" id="mobBar">
+            <button type="button" data-ins="tab" aria-label="插入缩进">Tab</button>
+            <button type="button" data-ins="{">{</button>
+            <button type="button" data-ins="}">}</button>
+            <button type="button" data-ins="(">(</button>
+            <button type="button" data-ins=")">)</button>
+            <button type="button" data-ins=";">;</button>
+            <button type="button" data-ins="->">-&gt;</button>
+            <button type="button" data-ins="// ">//</button>
+          </div>
+          <div class="edBottom">
+            <div class="hintbar"><span id="posInfo">Ctrl+Enter 运行　Ctrl+Shift+Enter 提交　Ctrl+F 查找　Tab 缩进　Ctrl+/ 注释</span><span class="saveInd" id="saveInd"></span></div>
+            <div class="btnRow">
+              <button class="btn ghost" id="demoBtn" type="button">逐行演示</button>
+              <button class="btn" id="btnRun" type="button">运行自测</button>
+              <button class="btn primary" id="btnSubmit" type="button">提交判题</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="right">
+        <section class="card panel">
+          <div class="tabs" id="tabs">
+            <button data-tab="result" class="on" type="button">运行结果</button>
+            <button data-tab="hint" type="button">提示</button>
+            <button data-tab="sol" type="button">题解</button>
+            <button data-tab="kb" type="button" title="当前模块核心知识卡">知识卡</button>
+            <button data-tab="err" type="button">错题本</button>
+            <button data-tab="ai" type="button" title="AI 助教（Alt+A）">AI 助教</button>
+          </div>
+          <div class="pane" id="pane"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+
+
+<div class="shareMask" id="shareMask">
+  <div class="shareBox">
+    <header class="shareHead">
+      <h3 style="font-size:15px;color:var(--mint)">📸 算法精进打卡卡片</h3>
+      <button class="dclose" id="shareClose" type="button" aria-label="关闭打卡">✕</button>
+    </header>
+    <div class="shareBody">
+      <div class="shareCanvasWrap">
+        <canvas id="shareCanvas" class="shareCanvas" width="600" height="780"></canvas>
+      </div>
+    </div>
+    <footer class="shareFoot">
+      <button class="btn sm" id="shareCopyBtn" type="button">📋 复制图片到剪贴板</button>
+      <button class="btn sm primary" id="shareDownloadBtn" type="button">📥 下载打卡图片 (PNG)</button>
+    </footer>
+  </div>
+</div>
+
+<div class="badgeMask" id="badgeMask">
+  <div class="badgeBox">
+    <header class="badgeHead">
+      <h3>🎖️ 我的算法成就墙</h3>
+      <span class="tiny" id="badgeSum" style="color:var(--mint)">—</span>
+      <button class="dclose" id="badgeClose" type="button" aria-label="关闭成就">✕</button>
+    </header>
+    <div class="badgeBody" id="badgeBody"></div>
+  </div>
+</div>
+
+<div class="rmask" id="repMask">
+  <div class="rbox">
+    <header class="rhead">
+      <h3>学习报告</h3>
+      <button class="dclose" id="repClose" type="button" aria-label="关闭报告">✕</button>
+    </header>
+    <div class="rbody" id="repBody"></div>
+    <footer class="rfoot">
+      <span class="tiny">数据只存在本机 · 想留存就点「备份进度」</span>
+      <button class="btn sm" id="repExport" type="button">导出 Markdown</button>
+    </footer>
+  </div>
+</div>
+
+<div class="dmask" id="dMask">
+  <div class="dshell">
+    <header class="dhead">
+      <h3><span class="dtag">STEP</span>逐行演示 <span class="dsub" id="dSub"></span></h3>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="dlegend"><span><i style="background:#6ED4B7"></i>指针</span><span><i style="background:#F2A64D"></i>本步修改</span></span>
+        <button class="dclose" id="dClose" type="button">✕</button>
+      </div>
+    </header>
+    <div class="dbody">
+      <section class="dleft">
+        <div class="dtool">
+          <label>参数</label>
+          <input id="dParams" type="text" spellcheck="false" placeholder="[1,2,3,4]">
+          <button class="btn sm" id="dRandParam" type="button" title="智能生成合法随机测试参数">🎲 随机</button>
+          <button class="btn sm" id="dRerun" type="button">重算</button>
+        </div>
+        <div class="dptags" id="dParamChips"></div>
+        <div class="derr" id="dErr" style="display:none"></div>
+        <div class="dcode" id="dCode"></div>
+        <div class="dtip2">点任意一行跳到那一步 · 橙色边框是本步被改的节点</div>
+      </section>
+      <section class="dright">
+        <div class="dstage" id="dWrap">
+          <div class="dplane" id="dPlane">
+            <div class="dlabels" id="dLabels"></div>
+            <div class="dlanes" id="dLanes"></div>
+            <div class="dchips" id="dChips"></div>
+            <svg class="darrows" id="dArrows"></svg>
+          </div>
+          <div class="dempty" id="dEmpty">没有可播放的步骤</div>
+        </div>
+        <div class="dmeta">
+          <span class="db" id="dBadge">第 1 行</span>
+          <span class="dnote" id="dNote"></span>
+          <span class="dcounter" id="dCounter">0 / 0</span>
+        </div>
+        <div class="dvars" id="dVars"></div>
+        <div class="darrays" id="dArrays"></div>
+        <div class="dresult" id="dResult"></div>
+      </section>
+    </div>
+    <footer class="dfoot">
+      <div class="dprog"><i id="dBar"></i></div>
+      <div class="dctrl">
+        <button id="dFirst" type="button" title="回到第一步">⏮</button>
+        <button id="dPrev" type="button" title="上一步（←）">◀</button>
+        <button id="dPlay" class="primary" type="button">播放</button>
+        <button id="dNext" type="button" title="下一步（→）">▶</button>
+        <button id="dLast" type="button" title="最后一步">⏭</button>
+        <select id="dSpeed"><option value="1400">慢</option><option value="900" selected>中</option><option value="450">快</option></select>
+        <span class="dtip">← → 单步 · 空格 播放 · Esc 关闭</span>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="impFile" accept="application/json" hidden>
+
+  <!-- 数据层 -->
+  <script src="data/modules.js"></script>
+  <script src="data/knowledge.js"></script>
+  <script src="data/problems.js"></script>
+
+  <!-- 核心逻辑层 -->
+  <script src="js/interpreter.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/judge.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/practice.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/complexity.js"></script>
+  <script src="js/share.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/sidepanel_sync.js"></script>
+</body>
+</html>
